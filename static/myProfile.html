@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+          <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+          <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+          <link rel="manifest" href="/site.webmanifest">
+          <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+          <meta name="msapplication-TileColor" content="#da532c">
+          <meta name="theme-color" content="#ffffff">
+          
+          <meta charset="UTF-8" />
+          <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+          />
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+          <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+            integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+            crossorigin="anonymous"
+          />
+          <title>My Profile</title>
+        </head>
+        <body
+        >
+          <header style="background-color: white" id="nav"></header>
+          <br />
+          <div
+            style="
+            display:none;
+              width: 60%;
+              padding-left: 80px;
+              padding-right: 80px;
+              padding-top: 50px;
+              padding-bottom: 50px;
+              background-color:white;
+              border-radius: 25px;
+              border-style: solid;
+            "
+            class="container wrapper"
+          >
+          <style>
+              .head{
+                  font-weight: bold;
+              }
+          </style>
+            <h1 class="text-center display-1">My Profile</h1>
+            <br>
+            <br>
+
+            <div class="row" style="font-size: x-large;">
+                <div class="col-4">
+                    <div class="head row">Email Address:</div>
+
+                </div>
+
+                <div class="col-8">
+                    <div class="row" id="profileEmail"></div>
+
+                </div>
+
+            </div>
+            <br>
+            <br>
+
+            <div class="container text-center">
+            <a class="btn btn-lg btn-primary rounded-pill " href="/home/me/changepassword">Change Password</a>
+            <a class="btn btn-lg btn-danger rounded-pill " href="/home/me/delete">Delete Account</a>
+
+        </div>
+          </div>
+        </body>
+      </html>
+      <script>
+        $(function () {
+          $("#nav").load("/homeNavigation.html");
+        });
+      </script>
+      <script>
+        window.onload = authenticateUser;
+        async function authenticateUser() {
+          if (sessionStorage.getItem("token")===null) {
+            window.location = "/login";
+            alert(
+              "You've got to login before you can do that."
+            );
+          } else {
+            const result = await fetch("/api/authenticate", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                token: sessionStorage.getItem("token"),
+              }),
+            }).then((res) => res.json());
+      
+            if (result.status === "ok") {
+              console.log("User token verified");
+              $(".wrapper").fadeIn(700);
+            } else {
+              alert(result.error);
+              window.location = "/login";
+            }
+            $('#profileEmail').html(sessionStorage.getItem("username"))
+          }
+        }
+
+
+</script>      
+
+    </div>
+  </body>
+</html>

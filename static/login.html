@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    />
+    <title>Login</title>
+  </head>
+
+  <body
+>
+<header style="background-color: white" id="nav"></header>
+
+  <br />
+<div style="display:none" class="wrapper">
+  <div
+    style="
+      border-style: solid;
+
+      width: fit-content;
+      padding-left: 80px;
+      padding-right: 80px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      background-color: white;
+      border-radius: 25px;
+    "
+    class="container text-center"
+  >
+  <h1 class="display-1">Login</h1>
+  <br />
+    <form id="login-form">
+      <div>
+      <input class="form-control-lg" type="text" autocomplete="off" id="uname" placeholder="Email" />
+    </div>
+    <br>
+    <div>
+      <input
+      class="form-control-lg"
+        type="password"
+        autocomplete="off"
+        id="password"
+        placeholder="Password"
+      />
+    </div>
+    <br>
+
+    <div>
+      <input
+        class="btn btn-lg btn-primary"
+        type="submit"
+        autocomplete="off"
+        id="submit"
+        value="Submit"
+      />
+    </div>
+    <div style="margin-top: 10px">
+      <a href="/register">Sign-up instead</a>
+    </div>
+    </form>
+  </div>
+
+
+  </body>
+</html>
+
+<script>
+  const form = document.getElementById("login-form");
+  form.addEventListener("submit", loginUser);
+  async function loginUser(event) {
+    event.preventDefault();
+    const username = document.getElementById("uname").value;
+    const password = document.getElementById("password").value;
+    const result = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    }).then((res) => res.json());
+
+    if (result.status === "ok") {
+      console.log("Got the token: ", result.data);
+      sessionStorage.setItem("token", result.data);
+      sessionStorage.setItem("username", result.username);
+      window.location = "/home";
+    } else {
+      alert(result.error);
+    }
+  }
+</script>
+
+
+<script>
+window.onload = authenticateUser;
+async function authenticateUser() {
+  $(".wrapper").fadeIn(700);
+if (!sessionStorage.getItem("token")) {
+} else {
+  const result = await fetch("/api/authenticate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      token: sessionStorage.getItem("token"),
+    }),
+  }).then((res) => res.json());
+
+  if (result.status === "ok") {
+    window.location = "/home"
+  }
+
+}
+}
+</script>
+
+<script>
+  $(".nav-link").click(function () {
+    $(".wrapper").fadeOut(700);
+  });
+
+  $(function () {
+    $("#nav").load("/navigation.html");
+  });
+</script>

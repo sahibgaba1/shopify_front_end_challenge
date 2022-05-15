@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    />
+    <title>Sign-Up</title>
+  </head>
+  <body></body>
+    <header style="background-color: white" id="nav"></header>
+    <br />
+    <div
+      style="
+        border-style: solid;
+        width: fit-content;
+        padding-left: 80px;
+        padding-right: 80px;
+        padding-top: 50px;
+        padding-bottom: 50px;
+        background-color: white;
+        border-radius: 25px;
+        display: none;
+      "
+      class="wrapper container text-center"
+    >
+      <h1 class="display-1">Sign-Up</h1>
+      <br />
+      <form id="reg-form">
+        <div>
+          <input
+            class="form-control-lg"
+            type="text"
+            autocomplete="off"
+            id="username"
+            placeholder="Email Address"
+            required
+          />
+        </div>
+        <br />
+        <div>
+          <input
+            class="form-control-lg"
+            type="password"
+            autocomplete="off"
+            id="password"
+            placeholder="Password"
+            required
+          />
+        </div>
+        <br />
+
+        <div>
+          <input
+            class="form-control-lg"
+            type="password"
+            autocomplete="off"
+            id="password2"
+            placeholder="Confirm Password"
+            required
+          />
+        </div>
+        <br />
+
+        <div>
+          <input
+            class="btn btn-lg btn-primary"
+            type="submit"
+            autocomplete="off"
+            id="submit"
+            value="Submit"
+          />
+        </div>
+        <div style="margin-top: 10px">
+          <a href="/login">Login instead</a>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
+<script>
+  window.onload = authenticateUser;
+  async function authenticateUser() {
+    $(".wrapper").fadeIn(700);
+    if (!sessionStorage.getItem("token")) {
+    } else {
+      const result = await fetch("/api/authenticate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: sessionStorage.getItem("token"),
+        }),
+      }).then((res) => res.json());
+
+      if (result.status === "ok") {
+        window.location = "/home";
+      }
+    }
+  }
+</script>
+
+<script>
+  const form = document.getElementById("reg-form");
+  form.addEventListener("submit", registerUser);
+  async function registerUser(event) {
+    event.preventDefault();
+    const username = $("#username").val();
+    const password = $("#password").val();
+    const password2 = $("#password2").val();
+
+    const validateEmail = (username) => {
+      return username.match(
+        /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+    };
+
+    if (password != password2) {
+      alert("The passwords you typed in do not match.");
+    } else if (!validateEmail(username)) {
+      alert("Please provide a valid email address.");
+    } else {
+      const result = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      }).then((res) => res.json());
+
+      if (result.status === "ok") {
+        window.location = "/login";
+        alert("Thanks for registering " + username + ". Please login...");
+      } else {
+        alert(result.error);
+      }
+    }
+  }
+</script>
+<script>
+  $(".nav-link").click(function () {
+    $(".wrapper").fadeOut(700);
+  });
+
+  $(function () {
+    $("#nav").load("/navigation.html");
+  });
+</script>

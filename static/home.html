@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Haiku AI</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <header id="nav" style="background-color: white"></header>
+    <div style="display: none" class="wrapper container">
+      <div
+        style="margin-left: auto; margin-right: auto"
+        class="container text-center"
+      >
+        <br />
+        <h1
+          style="color: black; margin-bottom: 50px; margin-top: 50px"
+          class="title display-4 font-weight-normal"
+        >
+          I can write you a haiku about anything...
+        </h1>
+        <br />
+        <div class="container">
+          <form id="searchbar" class="form-control-lg" action="">
+            <div class="container">
+              <input
+                id="searchInput"
+                class="form-control form-control-lg"
+                type="text"
+                placeholder="What would you like me to write about..."
+              />
+            </div>
+            <br />
+            <div class="container">
+              <input
+                class="btn btn-lg btn-primary"
+                type="submit"
+                autocomplete="off"
+                id="search"
+                value="Search"
+              />
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div
+        class="card"
+        style="
+          display: none;
+          width: 66%;
+          margin-right: auto;
+          margin-left: auto;
+          margin-top: 125px;
+          margin-bottom:25px;
+        "
+        id="result"
+      >
+        <div class="card-header" style="text-align:center;">
+          <h1 id="word"></h1>
+        </div>
+        <div class="card-body">
+            <p id="haiku" style="text-align:center; white-space:pre; font-family:'Comic Sans MS', 'Comic Sans', cursive; line-height: 3; font-size: xx-large;"></p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script>
+  window.onload = authenticateUser;
+  async function authenticateUser() {
+    if (sessionStorage.getItem("token") === null) {
+      window.location = "/register";
+      alert("You have to sign up before you can do that!");
+    } else {
+      const result = await fetch("/api/authenticate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: sessionStorage.getItem("token"),
+        }),
+      }).then((res) => res.json());
+
+      if (result.status === "ok") {
+        console.log("User token verified");
+        $(".wrapper").fadeIn(700);
+      } else {
+        alert("You have to sign up before you can do that!");
+        window.location = "/register";
+      }
+    }
+  }
+</script>
+
+<script>
+  async function checkMongoose(keyword) {
+    const result = await fetch("/home/search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        keyword: keyword,
+      }),
+    }).then((res) => res.json());
+    return result;
+  }
+
+  $("#searchbar").submit(function (e) {
+    e.preventDefault();
+    submitForm();
+  });
+
+
+  async function submitForm() {
+    var keyword = capitalizeFirstLetter($("#searchInput").val());
+    console.log(keyword);
+
+        const result = await checkMongoose(keyword);
+        
+
+        if (result.status === "ok") {
+          console.log("Got the JSON from the database: ", result.data);
+          $("#word").text(keyword);
+          $("#haiku").text(result.data.substr(2));
+          $("#result").fadeIn(700);
+
+          $("#searchbar").trigger("reset");
+        } 
+        else {
+
+        const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ subject: keyword }),
+        });
+
+
+        const data = await response.json();
+
+        await fetch("/home/search/api", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            keyword: keyword,
+            data: data.result,
+          }),
+        })
+      
+        if (data) {
+          console.log("Got the JSON from the API: ", data.result);
+          $("#word").text(keyword);
+          $("#haiku").text(data.result.substr(2));
+          $("#result").fadeIn(700);
+
+          $("#searchbar").trigger("reset");
+        } else {
+          alert("Something went wrong!");
+        }
+      };}
+    
+</script>
+
+<script>
+
+  function capitalizeFirstLetter(string) {
+    const mySentence = string;
+    const words = mySentence.split(" ");
+    for (let i = 0; i < words.length; i++) {
+      words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+    }
+    return words.join(" ");
+  }
+</script>
+
+<script>
+  $(".nav-link").click(function () {
+    $(".wrapper").fadeOut(700);
+  });
+
+  $("#nav").load("/homeNavigation.html");
+</script>
