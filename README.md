@@ -1,1 +1,1 @@
-# IPGeolocationProject
+# Shopify_Front_End_Challenge
