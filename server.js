@@ -15,11 +15,17 @@ const User = require('./model/user');
 
 const { SESSION_SECRET } = process.env;
 const { MONGO_SECRET } = process.env;
+const { OPENAI_SECRET } = process.env;
+
 
 app.use('/', express.static(root));
 app.use(express.json());
 
+
 const port = 8080;
+
+
+
 
 app.listen(process.env.port || port, () =>
   console.log(`Your server has started on port '${port}!`)
@@ -30,7 +36,6 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/api/generate', async (req, res) => {
-  const { OPENAI_SECRET } = process.env;
 
   const configuration = new Configuration({
     apiKey: OPENAI_SECRET,
