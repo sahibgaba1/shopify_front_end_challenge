@@ -1,5 +1,0 @@
-runtime: nodejs14
-env_variables:
-  SESSION_SECRET: "fdausdbngasiod8w9qtbu"
-  MONGO_SECRET: "sahibgaba"
-  OPENAI_SECRET: "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"
