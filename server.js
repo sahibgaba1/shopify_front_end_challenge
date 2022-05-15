@@ -7,7 +7,6 @@ const app = express();
 const mongoose = require('mongoose');
 
 const bcrypt = require('bcrypt');
-const dotenv = require('dotenv').config();
 
 const root = path.join(__dirname, 'static');
 const jwt = require('jsonwebtoken');
@@ -19,8 +18,12 @@ const { MONGO_SECRET } = process.env;
 
 app.use('/', express.static(root));
 app.use(express.json());
-app.listen(8080);
-console.log('Server running on localhost 8080');
+
+const port = 8080;
+
+app.listen(process.env.port || port, () =>
+  console.log(`Your server has started on port '${port}!`)
+);
 
 app.get('/login', (req, res) => {
   res.sendFile(`${root}/login.html`);

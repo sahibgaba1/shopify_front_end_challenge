@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
     "devstart": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -36,10 +37,10 @@
     "passport": "^0.5.0",
     "passport-local": "^1.0.0",
     "react-toastify": "^8.1.0",
-    "toastify-js": "^1.11.2"
+    "toastify-js": "^1.11.2",
+    "dotenv": "^10.0.0"
   },
   "devDependencies": {
-    "dotenv": "^10.0.0",
     "eslint": "^8.15.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
