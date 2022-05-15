@@ -135,11 +135,17 @@
 
         const result = await checkMongoose(keyword);
         
-
+   
         if (result.status === "ok") {
+
+               
+          while (result.data.charAt(0)==='\n' || result.data.charAt(0)===" "){
+            result.data = result.data.substr(1)
+          }
+
           console.log("Got the JSON from the database: ", result.data);
           $("#word").text(keyword);
-          $("#haiku").text(result.data.substr(2));
+          $("#haiku").text(result.data);
           $("#result").fadeIn(700);
 
           $("#searchbar").trigger("reset");
@@ -167,11 +173,17 @@
             data: data.result,
           }),
         })
+
+                
+        while (data.result.charAt(0)==='\n' || data.result.charAt(0)===" "){
+          data.result = data.result.substr(1)
+        }
+
       
         if (data) {
           console.log("Got the JSON from the API: ", data.result);
           $("#word").text(keyword);
-          $("#haiku").text(data.result.substr(2));
+          $("#haiku").text(data.result);
           $("#result").fadeIn(700);
 
           $("#searchbar").trigger("reset");
